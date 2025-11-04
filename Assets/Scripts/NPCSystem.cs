@@ -1,34 +1,55 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class NPCSystem : MonoBehaviour
 {
-    bool player_dectection = false;
+    public TextMeshProUGUI interactText; // ลาก TextMeshPro ของ UI มาที่นี่ใน Inspector
 
-    // Update is called once per frame
+    private bool player_detection = false;
+
+    void Start()
+    {
+        if (interactText != null)
+            interactText.gameObject.SetActive(false); // เริ่มปิดไว้
+    }
+
     void Update()
     {
-
-        if (player_dectection && Input.GetKeyDown(KeyCode.F))
+        if (player_detection)
         {
-            print("it worked somehow?!?!");
-        }
+            if (interactText != null && !interactText.gameObject.activeSelf)
+                interactText.gameObject.SetActive(true);
 
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                Debug.Log("NPCSystem: Player pressed F while in range.");
+                // ใส่โค้ดเปิดบทสนทนา / ให้ภารกิจ ฯลฯ ที่นี่
+            }
+        }
+        else
+        {
+            if (interactText != null && interactText.gameObject.activeSelf)
+                interactText.gameObject.SetActive(false);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.name == "PlayerBody")
+        Debug.Log("OnTriggerEnter with: " + other.name + " tag: " + other.tag);
+        if (other.CompareTag("Player"))
         {
-            player_dectection = true;
+            player_detection = true;
+            Debug.Log("Player detected - set player_detection true");
         }
     }
 
-
     private void OnTriggerExit(Collider other)
     {
-        player_dectection = false;
+        Debug.Log("OnTriggerExit with: " + other.name + " tag: " + other.tag);
+        if (other.CompareTag("Player"))
+        {
+            player_detection = false;
+            Debug.Log("Player left - set player_detection false");
+        }
     }
-
 }
