@@ -1,16 +1,15 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using TMPro;
 
 public class NPCSystem : MonoBehaviour
 {
-    public TextMeshProUGUI interactText; // ≈“° TextMeshPro ¢Õß UI ¡“∑’Ëπ’Ë„π Inspector
-
+    public TextMeshProUGUI interactText;
     private bool player_detection = false;
 
     void Start()
     {
         if (interactText != null)
-            interactText.gameObject.SetActive(false); // ‡√‘Ë¡ª‘¥‰«È
+            interactText.gameObject.SetActive(false);
     }
 
     void Update()
@@ -23,7 +22,10 @@ public class NPCSystem : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.F))
             {
                 Debug.Log("NPCSystem: Player pressed F while in range.");
-                // „ Ë‚§È¥‡ª‘¥∫∑ π∑π“ / „ÀÈ¿“√°‘® œ≈œ ∑’Ëπ’Ë
+
+                // ‚úÖ ‡πÄ‡∏°‡∏∑‡πà‡∏≠‡∏Ñ‡∏∏‡∏¢‡πÄ‡∏™‡∏£‡πá‡∏à ‡πÉ‡∏´‡πâ‡πÅ‡∏à‡πâ‡∏á‡∏ß‡πà‡∏≤‡πÄ‡∏Ñ‡∏ß‡∏™‡πÄ‡∏™‡∏£‡πá‡∏à
+                if (QuestUIManager.Instance != null)
+                    QuestUIManager.Instance.CompleteQuest();
             }
         }
         else
@@ -35,21 +37,13 @@ public class NPCSystem : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("OnTriggerEnter with: " + other.name + " tag: " + other.tag);
         if (other.CompareTag("Player"))
-        {
             player_detection = true;
-            Debug.Log("Player detected - set player_detection true");
-        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log("OnTriggerExit with: " + other.name + " tag: " + other.tag);
         if (other.CompareTag("Player"))
-        {
             player_detection = false;
-            Debug.Log("Player left - set player_detection false");
-        }
     }
 }
