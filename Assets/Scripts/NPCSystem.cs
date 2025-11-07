@@ -1,79 +1,77 @@
-﻿using UnityEngine;
-using TMPro; // 👈 เพิ่มบรรทัดนี้
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
 
 public class NPCSystem : MonoBehaviour
 {
-    public string npcName = "Local Villager";
-    public string[] dialogueLines;
-    private int currentLine = 0;
-    private bool playerInRange = false;
+    public GameObject dialogueUI;              // กล่องบทสนทนา (DialogueUI)
+    public TextMeshProUGUI nameText;           // ช่องชื่อ NPC
+    public TextMeshProUGUI dialogueText;       // ช่องข้อความคุย
+    public TextMeshProUGUI pressFText;         // "Press F to talk" กลางจอ
 
-    public GameObject dialogueUI;
-    public TextMeshProUGUI dialogueText;   // 👈 ใช้ TMP
-    public TextMeshProUGUI npcNameText;    // 👈 ใช้ TMP
+    private bool playerInRange = false;
+    private bool dialogueActive = false;
 
     void Start()
     {
-        dialogueUI.SetActive(false);
+        // ปิด UI ทุกอย่างตอนเริ่มเกม
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
+        if (pressFText != null)
+            pressFText.gameObject.SetActive(false);
     }
 
     void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.F))
+        if (playerInRange)
         {
-            if (!dialogueUI.activeSelf)
+            // แสดงข้อความกด F เมื่ออยู่ใกล้
+            pressFText.gameObject.SetActive(true);
+
+            if (Input.GetKeyDown(KeyCode.F))
             {
-                dialogueUI.SetActive(true);
-                npcNameText.text = npcName;
-                dialogueText.text = dialogueLines[currentLine];
-            }
-            else
-            {
-                currentLine++;
-                if (currentLine < dialogueLines.Length)
-                {
-                    dialogueText.text = dialogueLines[currentLine];
-                }
+                if (!dialogueActive)
+                    StartDialogue();
                 else
-                {
-                    dialogueUI.SetActive(false);
-                    currentLine = 0;
-
-                    FindObjectOfType<XPManager>().AddXP(50);
-                    print("Player got 50 XP from NPC!");
-                }
+                    EndDialogue();
             }
         }
-        void Update()
+        else
         {
-            // ถ้า UI ถูกเปิดจากที่อื่นให้ปิดก่อน (debug)
-            // Debug: show current state
-            // Debug.Log("playerInRange = " + playerInRange);
-
-            if (playerInRange && Input.GetKeyDown(KeyCode.F))
-            {
-                // handle dialogue open/next
-            }
+            pressFText.gameObject.SetActive(false);
         }
+    }
+
+    private void StartDialogue()
+    {
+        dialogueActive = true;
+        dialogueUI.SetActive(true); // เปิด UI คุย
+        nameText.text = "Local Person"; // ชื่อ NPC
+        dialogueText.text = "Hello! Welcome to our town. Let's learn some English words!";
+        pressFText.gameObject.SetActive(false); // ซ่อน Press F
+    }
+
+    private void EndDialogue()
+    {
+        dialogueActive = false;
+        dialogueUI.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"NPC OnTriggerEnter: name='{other.name}' tag='{other.tag}' layer='{LayerMask.LayerToName(other.gameObject.layer)}' isTrigger={other.isTrigger}");
         if (other.CompareTag("Player"))
-        {
             playerInRange = true;
-            Debug.Log("NPC: Player detected -> playerInRange = true");
-        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log($"NPC OnTriggerExit: name='{other.name}' tag='{other.tag}' layer='{LayerMask.LayerToName(other.gameObject.layer)}' isTrigger={other.isTrigger}");
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
-            Debug.Log("NPC: Player left -> playerInRange = false");
+            dialogueUI.SetActive(false);
+            dialogueActive = false;
         }
     }
 }
